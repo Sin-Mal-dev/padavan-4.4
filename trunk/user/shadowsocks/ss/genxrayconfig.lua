@@ -57,7 +57,7 @@ log = {
 	-- 底层传输配置
 		streamSettings = {
 			network = server.transport,
-			security = (server.tls == '1') and "tls" or ((server.tls == '2') and "xtls" or "none"),
+			security = (server.tls == '1') and "tls" or ((server.tls == '2') and "xtls" or ((server.tls == '3') and "reality" or "none")),
 			tlsSettings = (server.tls == '1') and 
 			{
 				allowInsecure = (server.insecure ~= "0") and true or false,
@@ -68,6 +68,12 @@ log = {
 			{
 				allowInsecure = (server.insecure ~= "0") and true or false,
 				serverName = server.tls_host
+			} or nil,
+
+			realitySettings = (server.tls == '3') and
+			{
+				allowInsecure = (server.insecure ~= "0") and true or false,
+				serverName = server.reality_host
 			} or nil,
 
 		        tcpSettings = (server.transport == "tcp" and server.tls ~= '2') and {
@@ -109,7 +115,19 @@ log = {
 				header = {
 					type = server.quic_guise
 				}
-			} or nil
+			} or nil,
+			httpupgradeSettings = (server.transport == "httpupgrade") and (server.httpupgrade_path ~= nil or server.httpupgrade_host ~= nil) and {
+				path = server.httpupgrade_path,
+				headers = (server.httpupgrade_host ~= nil) and {
+					Host = server.httpupgrade_host
+				} or nil,
+			} or nil,
+			splithttpSettings = (server.transport == "splithttp") and (server.splithttp_path ~= nil or server.splithttp_host ~= nil) and {
+				path = server.splithttp_path,
+				headers = (server.splithttp_host ~= nil) and {
+					Host = server.splithttp_host
+				} or nil,
+			} or nil,
 		},
 		mux = {
 			enabled = (server.mux == "1") and true or false,
